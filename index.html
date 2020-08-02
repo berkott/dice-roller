@@ -1,0 +1,90 @@
+<html lang="english">
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <title>Dice Roller</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.2.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <div class="container" style="text-align: center; margin-top: 30px;">
+        <h1>
+            Dice Roller
+        </h1>
+        <h6 id="time"></h6>
+        
+        <button type="button" class="btn btn-primary" onclick="roll()">Roll!</button>
+        
+
+        <ul class="list-group" id="past-rolls" style="margin-top: 10px;">
+        </ul>
+    </div>
+
+    <script type="text/JavaScript">
+        let pastRolls = [];
+        let rollNumber = 1;
+
+        function roll() {
+            // launch a few confetti from the left edge
+            confetti({
+                particleCount: 200,
+                angle: -90,
+                spread: 180,
+                origin: { x: 0.5, y: 0 },
+                startVelocity: 50
+            });
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "https://www.random.org/integers/?num=2&min=1&max=6&col=1&base=10&format=plain&rnd=new", true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send();
+            xhr.onload = function() {
+                var today = new Date();
+
+                var h = today.getHours();
+                var m = today.getMinutes();
+                var s = today.getSeconds();
+                // add a zero in front of numbers<10
+                m = checkTime(m);
+                s = checkTime(s);
+
+                console.log(this.responseText);
+                let splitRolls = this.responseText.split(/\n/);
+
+                var ul = document.getElementById("past-rolls");
+
+                pastRolls.unshift('<li class="list-group-item"><div class="row"><div class="col" style="text-align: left;"><h5>Number: ' + rollNumber + ' at ' + (h + ":" + m + ":" + s) + '</h5></div><div class="col" style="text-align: right;"><h5>' + splitRolls[0] + ' + ' + splitRolls[1] + ' = ' + (parseInt(splitRolls[0]) + parseInt(splitRolls[1]))+ '</h5></div></div></li>');
+
+                ul.innerHTML = pastRolls.join('');
+
+                rollNumber++;
+            }
+        }
+
+        function checkTime(i) {
+            if (i < 10) {
+                i = "0" + i;
+            }
+            return i;
+        }
+
+        function startTime() {
+            var today = new Date();
+            var h = today.getHours();
+            var m = today.getMinutes();
+            var s = today.getSeconds();
+            // add a zero in front of numbers<10
+            m = checkTime(m);
+            s = checkTime(s);
+            document.getElementById('time').innerHTML = "Current Time: " + h + ":" + m + ":" + s;
+            t = setTimeout(function() {
+                startTime()
+            }, 500);
+        }
+        startTime();
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+</body>
+</html>
